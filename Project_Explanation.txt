@@ -1,0 +1,368 @@
+
+Insight Policy Change workflow
+
+i have worked on workflow concept for Insight policy change.
+we have a problem that is we faced some exception on that functionality because of that icustomer were being  charged multiple times that particular policy has not or cannot even bound .
+So we choosen the solution by adding the condition of  the cancel or bind step to 
+check for preemption activity.
+if check find if it find the any preemption activity then it will send the preemption activity and  cancel the workflow
+if check doesn't any activity then it will bound the workflow.
+
+general:
+effdatebranch to find the past time and effective time
+Basedon = Pervious version of the entity
+slicemode = viewing policy date in specified date in effective time.
+sliceview = branch.slicedate.
+
+window mode = view all version of  policy date  in effective time.
+vehicle.allversion
+modeltime= time period where job is bounded.
+effective time = time dimension of the policy itself within the policyperiod.
+
+Activity Pattern
+Short Subject :A brief description of the activity Pattern
+Email template - Email template to display if you select this activity
+Escation days- no of days from the Escalation start days
+Escalation hours - No of days from the Escalation Start date
+prority-high,low,medium,top
+targetdays-The number of days from the targetstartpoint to set the activity’s Target Date.
+targethous -The number of hours from the targetstartpoint to set the activity’s Target Date.
+
+Webservice-
+DTO:
+In Gosu ,If we we want to create a DTO we want to create a class that must decalred as final 
+and Add @wsiExportable annotation.
+
+So the @wsiExportable can be used for the both the request and response classess.
+Soapwebservice:
+SOAP - simple object access protocol.
+WSDL - Webservice Description language
+SoapWebservice is a collection of open protocol they are :
+html, java,wsdl,xml
+communiation is synchrounous.
+
+Consuming the webserve:
+if u are consuming the webservice from the claimcenter app
+and calling from the external app
+Gosu were deserilizating that request in gosu object
+so that you Gosu code can access.
+
+Fist of all you have to create the package for webservice collection:
+create a new web service collection-gsrc.productcode.websercice.function name
+fetch the resources-
+specify the url 
+Regenrate the xml classes
+Reference the webservice collection in 
+gosu
+Reference to new api instance.
+create a new instance of the api, add the properties which are available in the api like username and password
+and call the methods in there with the parameters that you want.
+
+
+Publising the Webservice:
+For u are using publising the webservice you were serilizing the 
+parameters into flattern form to send to api.
+Here request are synchrounous
+
+Create a package for webservice-
+Create a gosu api class-
+where we add @wsiwebservice annotation
+create a gosu class for return type(if necessary)-
+we add @wsiExportable annotation to specify that the class is serilizable
+final keyword specified that cals can't be subtyped
+we can use the bundles in webservice by calling the runwithnewbundle block to commit the data to entity.
+gwb genwsilocal for generating local wsdl for all webservice
+Restart the server-
+
+  
+  
+
+
+Renewal Externalization:
+So i was worked on the Home Product on that which mainly comes under the renewal policy.
+Extternalization is the proces where we using Light weight rating method.
+Here we used the Quotemodel consist of Light weight pogo classes to achieve better performance compared
+to Guidewire entity model.classes of Quotemodel conist of Inheritance concept.
+
+polaris and Earnix and IHP:
+we were created payloads for request.
+P is responsible for calculatinng insurance products and other terms and condition.
+It supports all line of buisness such as car, home, van and bike.
+
+Earnix is the Optimization engine which is used to calculate the discounts and commision 
+based net quote rate provided by previous polaris response.
+
+IHP is used for net primeium
+
+After we creating this payload we saved this payload in the database to
+check the structure of the request.
+
+
+
+
+
+
+A web service can accept a Gosu object as an argument. It can also return a Gosu object. Such an object passed by a
+web service between remote processes is often referred to as a data transfer object or DTO.
+
+here we response after some rating and pricing which is happening on externalapp
+consuming the other webservice:
+Suit-cofig.xml-used to config other insurancesuite application 
+wsimport WSDL_LOCATION_URL -s SUBDIRECTORY_NAME---used for java intellij
+gwb genWsiLocal-For testing purposes only, the local files must be rebuilt by running the following command
+from the PolicyCenter installation directory.
+@WsiExportable - Add this annotation on a Gosu class to indicate that it supports serialization
+with web services.
+Seriliazation- new seerilization{
+sort = true- match the order of the element that match the existing the xml 
+validation = true-validate the xml against the xml documentation
+}
+Gxoption that change the xml export behavour
+
+consuming external webservice:
+// Set the web service endpoint URL for the web service WSDL
+var urlStr = "http://www.aGreatWebService.com/GreatWebService?wsdl"
+// Set the location in your file system for the web service WSDL
+var loc = "/wsi/remote/GreatWebService"
+// Load the web service WSDL into Gosu
+Wsdl2Gosu.fetch(new URL(urlStr), new File(loc))
+
+plugin:
+From a technical perspective, PolicyCenter defines a plugin as an interface, which is a set of methods that are
+necessary for a specific task
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Batch Process:
+Batch process is the background process that depend on independent user
+two types of batch
+custom,predefined
+
+custom Batch process:
+batches which is defined by integration developer
+
+for creating the batch process we need four steps
+they were:
+1.First step is creating a new typecode in batchprocess process typelist
+2.in that batchprocess, i have to create a new class which extends the batchprocessbase class
+there only method we override dowork method . there only we add the logic which takes no argument and perform the batchprocess
+the batch class ends with []batch name
+3. After that we want to reference our typecode in the processplugin class which implements Iprocessplugin we add that typecode inthe createbatchprocessmethod which is overrided from the iprocssplugin
+4.Final step is configure the  scheduconfig xml file
+
+properties that we can override from the Batchprocessbase class are :
+
+1.type-returns the type of the batchprocess process
+2.Operation Expected: Returns a count about how many operation that expects the batch process to perform as an integer.
+3.operation completed- returns the count of total operationcompleted for the batchprocess.
+4.CheckIntialCondition- this method is always returns true. That the intention of the method to check the environment server condition
+examples set server run level as maintainance only. We should not manually return false to this method. it will affect the runlevel of the 
+batch process.
+5. getdescription- return the description the batch process.
+6.incrementOperationsComplete()- count the number of the opertion which are executed during the 
+for example : whenever you modify the entity those time you want to check the process of the operation.
+7.incrementOperationsFailed- this property returns the reason why the operation failed. it stores
+the reason in the operationfailed array propery.
+8. SetchinkingbyId-using a series of separate quries in chuck, rather than retrieving all the queries 
+in a masive block.
+parameters were query and batachsize
+9.requestTermination-  whenever you click the stop button the batch get stooped by calling  
+this method It defaults return false. we ensure dowork method check this method frequently
+10.Exclusive- determine whether another instance of this batch is running while  this process is running
+if you want to run multiple instance set this method to false
+
+Scheduling the Batchprocess
+processschedule- describes which batch process to execute
+croneschedule- it is the child element which describes when batch process run.
+maintanancetoolapi.startbatchprocess("processname")
+
+nocurrentle bundle block is used in batchprocess instead use the runwithnewbundle block
+
+@@@@@@@@@@@@@@@@@@@@@@@@@
+predefined:
+Already configured batch process
+example: 
+Renewal start
+
+
+Messaging Events:
+you can send the message to the external system if something changes in the policycenter
+such as changed policy, it would trigger the event and sent the message to the external system.
+for example if you submit a new policy, you messaging code notifies a billing system about the 
+new policy.
+
+Event-if the entity type is defined as <event> tag  it trigger an event if a user click the 
+changed the application data or api the changed the data.
+
+After the event is trigerred, A call made to Event fire rule ,
+there we creating a Message payload is created, it is form of string.
+
+After the message is sent and all message object are changed into 
+Message History object.
+
+Message Destination:
+it an external system to send message 
+it represent a single message 
+it is registered a Studio
+  
+Root object
+the root object for the event is the entity instance
+root object is same as the root object of the event that triggered 
+the event fire rule within which you created the message.
+
+Acknoldgement:
+
+this represents that response from the external system
+_ and + acknoldgement
+
+error represent network problem
+when we get nak acknoldgement we are not able to resend the message.
+ 
+Safe ordering:
+it is nothing but it orders the message based on the time of creation of message 
+A messages with object without the primary object is considered as the non-sfe ordering message
+
+
+Message Request plugin-performs the message preprocessing
+company-appcode-messaging.functionalarea
+messageRequestinterferce->beforesendmethod->we have to pass message object
+message Transport plugin - performs the message trasnsport
+message reply plugin - performs the message reply
+
+
+before send method:-->Request Plugin
+here if we want format payload before sending to the external system, we need this method
+
+Transport Plugin is strictly required
+there we use the send method.
+
+Restriction in message creation in entity:
+do not add api call to change the entity data
+never delete the object
+
+Event fired rule
+four rule sets
+This rule is execute whent event entity in triggered
+
+Preupdate rule
+
+Rules execute when update occurred on root entity
+
+validation
+rules checks if the missing data on a root entity.
+
+
+ 
+ 
+ overall explanation about the message:
+ During Apllication starts,when user changes the data which is event entity and 
+ or api changed the event entity,it fires the event fire rule after that corresponding event entity
+ it creates a new message payload whihc is in the form of text based and add that payload in the
+ message send queue databse.
+ message send queue is nothing but it dispatches message from the message plugin 
+to send them to the external system.
+based on the request we get positve and negtive acknoldgment.
+********************************************
+Fundamentals of guidewire
+
+Validation:
+
+UI Screen:
+It is used to prevent the user to enter the wrong data.
+it guides the user to enter the data in right format.
+elements:
+Input mask
+Regular Expression
+
+Entity screen:
+in the datamodel we do the validation usig the valdaterxml file
+there we add validation definition.
+And in the entity we have to right click and select column param category and add validate type
+this helps prevents the usser to enter the wrong data
+
+we have validation rules for complex condition  which is
+implemented in Gosu Rule.
+
+we implement this using the delegate method
+for that we have add  validable delegate
+we have enable cheeckbox of the subtype entity trigger validation category.
+
+List View:
+List view is used to view the collection of multiple object
+at same time.
+it uses the row iterator and renders the object as each one row.
+by using addto and removeto to add and remove datas
+values
+valuetype
+elementname
+editable
+
+Listview is used in screen using panelref
+
+If you set editable property to true for row iterator
+then you don't need to set the editable property to
+true for all widjet and row 
+
+exposeiterator is defined
+toadd and tooremove
+we also learned the sorting method
+
+@@@@@@@@@
+Typelist
+it is a predefined list of values,
+typically used as dropdown
+
+Typefilter:
+it defines the subset of typecodes
+
+popup
+popup screen comes under the location group
+it is return to the original location once the
+popup is closed.
+
+inputset:
+cannot have toolbar,input column
+organize the group of atomic widget
+
+Partial Page update:
+has two types ->Data only and Layout re-render
+
+Modes
+it is used to identify the scenoria
+that the pcf for 
+
+what are your expectation for me in this role?
+what are the most important project that i would be take on?
+whar are the biggest challenges that i might face in this position
+can you tell me about team I'll be working with
+how long have you been at the company
+what is your favorite part of working here
+what are developement and opportunity that I WILL  get from
+this company?
+
+foriegn key 
+pointer to single instance of the entity
+
+
+ey exit
+https://e-exit.ey.net/
+
+
+Hi George,
+I am currenlty in bench in ey gds, So I planned to switch another company. So I changed my last date as 30 june in ey exit tool. So am iable to get released from the 
+company within 2 months.
+
+hi srini
+good --
+I was in bench in ey for more the 5 months that is the reason I intiated my resignation.
+other than i got offer letter from CGI
+
+
+
+
+
+
+
+
+
+
+
+
